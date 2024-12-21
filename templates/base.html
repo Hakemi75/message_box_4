@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MessageBOX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="page">
+        <h1><a href="{{ url_for('index' ) }}">MessageBOX</a></h1>
+        <div class="metanav">
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('login' ) }}">LogIn</a>
+                <a href="{{ url_for('register' ) }}">Resigter</a>
+            {% else %}
+                <a href="{{ url_for('logout' ) }}">LogOut</a>
+            {% endif %}
+        </div>
+        {% for message in get_flashed_messages() %}
+            <p>{{ message }}</p>
+        {% endfor %}
+
+        {% block content %}
+            
+        {% endblock %}
+    </div>
+</body>
+</html>

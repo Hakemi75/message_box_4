@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if current_user.is_authenticated %}  {# ログインしている場合に表示 #}
+        <h2>Create</h2>
+        <form action="{{ url_for('reply', message_id=message_id) }}" method="post" class="message-form">
+            <label for="message">Message:</label>
+            <br>
+            <textarea name="content" id="message" placeholder="今の気分はいかがですか？"></textarea>
+            <br>
+            <input type="submit" value="Create" />
+        </form>
+    {% endif %}
+    <h2>返信一覧</h2>
+    <ul>
+        {% for message in messages %}
+        <div class="message">
+            <li>
+                <img src="http://www.gravatar.com/avatar/{{ message.user.email }}?d=identicon&s=80" alt="" class="avatar">
+                {{ message.user.name }} {{ message.pub_date }}
+                {% if message.user == current_user %}
+                    <form action="{{ url_for('delete', message_id=message.id) }}" method="post" style="display:inline;">
+                        <input type="submit" value="削除" onclick="if(!confirm('このメッセージを削除しますか？')) return false">
+                    </form>
+                {% endif %}
+                <div class="message-content">
+                    <a href="{{ url_for('show', message_id=message.id ) }}">
+                        {{ message.content }}
+                    </a>
+                    {% if message.messages.count() > 0 %}
+                        {{ message.messages.count() }}件の返信
+                    {% endif %}
+                    <div class="message-actions">
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.likes.where(Like.message == message).exists() %}
+                                <form action="{{ url_for('unlike_message', message_id=message.id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="like-button liked">♥ {{ message.likes_count }}</button>
+                                </form>
+                            {% else %}
+                                <form action="{{ url_for('like_message', message_id=message.id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="like-button">♡ {{ message.likes_count }}</button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <span class="like-count">♡ {{ message.likes_count }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+        </div>
+        {% endfor %}
+    </ul>
+{% endblock %}
